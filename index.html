@@ -52,6 +52,15 @@
   .speaker-role{font-size:12px;color:#64748B;margin-top:1px}
   .speaker-bio{font-size:13px;color:#475569;line-height:1.6;padding:10px 14px 12px;border-top:1px solid #E2E8F0}
 
+  .watch-bar{display:flex;align-items:flex-start;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0}
+  .watch-check{display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:pointer;padding:8px 14px;border-radius:8px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:all .15s;white-space:nowrap}
+  .watch-check.watched{background:#DCFCE7;border-color:#22C55E}
+  .watch-check input{width:16px;height:16px;cursor:pointer;accent-color:#22C55E}
+  .watch-check label{font-size:13px;font-weight:600;cursor:pointer;color:#475569}
+  .watch-check.watched label{color:#15803D}
+  .notes-box{flex:1;font-size:13px;padding:8px 10px;border-radius:8px;border:1.5px solid #E2E8F0;background:#F8FAFC;color:#374151;resize:vertical;min-height:38px;font-family:inherit;transition:border-color .15s}
+  .notes-box:focus{outline:none;border-color:#3B82F6}
+
   .footer{text-align:center;font-size:12px;color:#94A3B8;margin-top:24px;padding-top:16px;border-top:1px solid #E2E8F0}
 </style>
 </head>
@@ -70,6 +79,15 @@
       <div class="login-title">Access On-Demand Recordings</div>
       <div class="login-row">🔗 <a href="https://dileaders.com/disabilitysummit/on-demand-recordings/" target="_blank">https://dileaders.com/disabilitysummit/on-demand-recordings/</a></div>
       <div class="login-row">🔑 <strong>Password:</strong> DLds8319</div>
+    </div>
+  </div>
+
+  <div class="login-box" style="border-color:#22C55E;margin-bottom:16px">
+    <div class="login-icon">📋</div>
+    <div>
+      <div class="login-title" style="color:#15803D">Track Your Progress</div>
+      <div class="login-row">Mark which sessions you've watched and assign yourself to sessions in the shared tracker.</div>
+      <div class="login-row" style="margin-top:6px">🔗 <a href="https://docs.google.com/spreadsheets/d/1XMv7vMVsis2ZLbPq-_E0ohl5rEaxqfFE0xvT--axp48/edit?usp=sharing" target="_blank">Open Session Tracker →</a></div>
     </div>
   </div>
 
@@ -118,6 +136,19 @@ const SESSIONS = [
   {time:"17:15",title:"Online networking",type:"networking"},
   {time:"17:30",title:"Close of summit",type:"close"},
 ];
+
+const watched = JSON.parse(localStorage.getItem('summit_watched') || '{}');
+const notes = JSON.parse(localStorage.getItem('summit_notes') || '{}');
+
+function setWatched(i, val) {
+  watched[i] = val;
+  localStorage.setItem('summit_watched', JSON.stringify(watched));
+  render();
+}
+function setNote(i, val) {
+  notes[i] = val;
+  localStorage.setItem('summit_notes', JSON.stringify(notes));
+}
 
 let activeFilter = "all";
 const openSessions = new Set();
@@ -181,6 +212,13 @@ function render() {
             </div>`;
           }).join("")}
         ` : ""}
+        <div class="watch-bar">
+          <div class="watch-check ${watched[i]?"watched":""}" onclick="setWatched(${i}, ${!watched[i]})">
+            <input type="checkbox" ${watched[i]?"checked":""} readonly/>
+            <label>${watched[i]?"✅ Watched":"Mark as watched"}</label>
+          </div>
+          <textarea class="notes-box" placeholder="Add your notes here..." onchange="setNote(${i}, this.value)">${notes[i]||""}</textarea>
+        </div>
       </div>` : ""}
     </div>`;
   }).join("");
